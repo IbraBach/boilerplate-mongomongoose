@@ -108,7 +108,7 @@ router.get("/create-and-save-person", function (req, res, next) {
 
 const createPeople = require("./myApp.js").createManyPeople;
 router.post("/create-many-people", function (req, res, next) {
-  Person.remove({}, function (err) {
+  Person.deleteMany({}, function (err) {
     if (err) {
       return next(err);
     }
