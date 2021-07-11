@@ -1,34 +1,53 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const mongoDB = require('mongodb');
-const { Schema } = mongoose;
+const Schema = mongoose.Schema;
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true, 'useCreateIndex': true});
 
+const personSchema = new Schema({
+  name: { type: String, required: true },
+  age: Number,
+  favoriteFoods: [String]
+});
 
- const personSchema  = new Schema({
-   name: { type: String, required: true },
-   age: { type: Number, required: true },
-   favoriteFood: { type: [String], index: true }
- });
-
-let Person = mongoose.model('Person', personSchema);
+const Person = mongoose.model("Person", personSchema);
 
 
-const createAndSavePerson = (done) => {
-  done(null /*, data*/);
+const createAndSavePerson = (done) => { 
+  const person = new Person({
+    "name": "Ibra",
+    "age": 32, 
+    "favoriteFoods": ["Omelet", "Melon"]
+  });
+
+  person.save((err,data) => {
+    if (err) return done(err);
+  return done(null , data);
+  });
 };
 
 const createManyPeople = (arrayOfPeople, done) => {
-  done(null /*, data*/);
+  Person.create(arrayOfPeople,(err, data)=>{
+    if(err) return done(err);
+    return done(null, data);
+  })
 };
 
 const findPeopleByName = (personName, done) => {
-  done(null /*, data*/);
+  console.log(personName);
+  console.log(typeof personName);
+  Person.find({name: personName}, (err, data) => {
+     if (err) return done(err);
+    return done(null, data);
+  });
 };
 
 const findOneByFood = (food, done) => {
-  done(null /*, data*/);
+  Person.findOne({favoriteFoods: food}, (err, data)=> {
+     if (err) return done(err);
+    return done(null, data);
+  });
 };
 
 const findPersonById = (personId, done) => {
