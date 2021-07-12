@@ -51,35 +51,63 @@ const findOneByFood = (food, done) => {
 };
 
 const findPersonById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findById({_id: personId}, (err, data)=>{
+    if(err) return done(err);
+    return done(null, data);
+  });
 };
 
 const findEditThenSave = (personId, done) => {
   const foodToAdd = "hamburger";
-
-  done(null /*, data*/);
+  Person.findById({_id: personId}, (err, person)=>{
+    err ? console.error(err) : person;
+    person.favoriteFoods.push(foodToAdd);
+    person.markModified("edited-field");
+    person.save((err, person )=>err ? console.error(err) : done(null, person));
+  });
 };
 
+//Model.findOneAndUpdate(query, { name: 'jason bourne' }, options, callback) -- Mongoose Docs
 const findAndUpdate = (personName, done) => {
+  const query = {name: personName};
   const ageToSet = 20;
-
-  done(null /*, data*/);
+  const newData = {age: ageToSet};
+  const options = {new: true, useFindAndModify: false};
+  
+  Person.findOneAndUpdate(query, newData, options, (err, person) => {
+    err ? console.log(err) : person;
+    person.markModified("edited-field");
+    person.save((err, person ) => err ? console.error(err) : done(null, person));
+  });
 };
 
+//Model.remove(conditions -object-, options -object-, callback -function-) --Mongoose Docs
 const removeById = (personId, done) => {
-  done(null /*, data*/);
+  Person.findByIdAndRemove(personId, (err, removedPerson)=>{
+    err ? console.log(err) : removedPerson;
+    removedPerson.remove(removedPerson, (err, removedPerson)=>{
+      err ? console.log(err) : done(null, removedPerson);      
+    });
+  });
 };
 
 const removeManyPeople = (done) => {
   const nameToRemove = "Mary";
-
-  done(null /*, data*/);
+  Person.remove({ name: nameToRemove}, (err, res)=>{
+    err ? console.log(err) : done(null, res);
+  });
 };
 
 const queryChain = (done) => {
   const foodToSearch = "burrito";
-
-  done(null /*, data*/);
+  Person
+  .find({favoriteFoods: foodToSearch})
+  .sort('name')
+  .limit(2)
+  .select('-age')
+  .exec((err, data)=> {
+    err ? console.log(err) : done(null, data)
+  });
 };
 
 /** **Well Done !!**
